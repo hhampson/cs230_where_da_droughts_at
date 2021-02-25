@@ -91,6 +91,18 @@ def extract_temp_data(data, lat_lims, lon_lims, data_type):
           'area_values': area_values}
   return dict_temp
 
+def average_temp_data(area_value):
+  # Averages daily temperatures November to March.
+  area_average = np.empty((0,22, 22))
+  for i in range(1,6,1):
+    area = np.mean(area_value[(305*i):(305*i)+150,:,:],axis=0)
+    area_average = np.concatenate((area_average,np.reshape(area,(1,22,22))))
+
+  # check shape
+  # print(area_average.shape)
+  # print(area_value.shape)
+  return area_average
+
 # input range of years
 from_year = 2015
 to_year = 2019
@@ -117,18 +129,6 @@ for year in range(from_year, to_year+1, 1): # to include to_year
         else:
           data = FTPimprort(FILE_NAME)
           dict_tmin[year] = extract_temp_data(data, lat_lims, lon_lims, data_type)
-
-def average_temp_data(area_value):
-  # Averages daily temperatures November to March.
-  area_average = np.empty((0,22, 22))
-  for i in range(1,6,1):
-    area = np.mean(area_value[(305*i):(305*i)+150,:,:],axis=0)
-    area_average = np.concatenate((area_average,np.reshape(area,(1,22,22))))
-
-  # check shape
-  # print(area_average.shape)
-  # print(area_value.shape)
-  return area_average
 
 # combine data from all years
 tmin_all = np.concatenate((dict_tmin[2015]['area_values'],dict_tmin[2016]['area_values'],dict_tmin[2017]['area_values'],dict_tmin[2018]['area_values'],dict_tmin[2019]['area_values']))
@@ -169,4 +169,4 @@ def plot_map(variable, lon, lat, title):
   cb.set_label('Value')
   plt.show()
 
-plot_map(temp_area_values[14,:,:], tmin_area_lon, tmin_area_lat, 'TMIN')
+# plot_map(temp_area_values[14,:,:], tmin_area_lon, tmin_area_lat, 'TMIN')
