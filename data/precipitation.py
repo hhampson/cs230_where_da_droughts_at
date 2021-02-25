@@ -1,9 +1,17 @@
 """
 Authors: Bennett Bolen, Hannah Hampson, Mo Sodwatana
 February 24, 2021
+
+This script accounts for the precipitation input data for our model. It processes daily gridded precipitation data
+(courtesy of NOAA), and converts the data into a 4d array with dimensions (time, lat, lon). The data we are interested
+in are cumulative precipitation over the wetter 6 month period in California, where that period is defined in
+variables.py. This script goes through the file's time period, extracts each "wet" period, and sums daily precip (mm)
+over each lat, lon.
+
+The output is our 4d matrix for cumulative 6 month wet season precipitation, a list of corresponding years, a latitude
+numpy array, and longitude numpy array.
 """
 
-# TODO: fix convert_to_monthly - currently not concatenating correctly, and then avg over 6 month period
 
 import netCDF4 as nc
 from ftplib import FTP
@@ -19,14 +27,8 @@ def main():
     # download_data(filename)
     # view_data(filename)
     total_values, lat, lon, time, values = extract_data(filename)
-    month_values, month_times = convert_to_monthly(values, time)
-    # print(time[0:31])
-    print(np.sum(values[0:31, :, :].sum(axis=0) - month_values[0, :, :]))
-    print(time[0])
-    print(month_times[0])
-    print(values.shape)
-    print(month_values[0, :, :])
-    # print(len(month_times))
+    six_month_values, years = convert_to_six_month(values, time)
+    return six_month_values, years, lat, lon
 
 
 def download_data(filename):
@@ -54,6 +56,10 @@ def view_data(filename):
 
 
 def extract_data(filename):
+    """
+    Open up precipitation netcdf file and extract content, including clipping to the
+    latitude and longitude limits of interest (specified in variables.py).
+    """
     data = nc.Dataset(filename)
     values = data.variables['precip'][:]  # precipitation values in mm
     time_hrs = data.variables['time'][:]  # days since 1901-01-01
@@ -68,6 +74,10 @@ def extract_data(filename):
 
 
 def get_area_coords(coordinate_list, lims):
+    """
+    Given an array of coordinates and coordinate limits specified, return the
+    index corresponding to those limits and the clipped array.
+    """
     idx = []
     for lim in lims:
         minimum = float("inf")
@@ -91,22 +101,30 @@ def convert_time(time_hrs):
     return datetimes
 
 
-def convert_to_monthly(values, time):
+def convert_to_six_month(values, time):
     """
-    Converts daily precipitation data to monthly cumulative values.
+    Takes daily precipitation and sums total over the "wet"
+    six months of the year (specified in variables.py).
+
+    Returns:
+        six_month_values: np.array with dimensions (corresponding year, lat, lon)
+        years: list of integers representing year associated with first dimension of six_month_values.
+            Note that if wet year started November 2015 and ended April 2016, year = 2015.
     """
-    month_idx = 0
-    monthly_values = np.empty([1, values.shape[1], values.shape[2]])  # create empty array
-    month_times = []
+    six_month_values = np.empty([1, values.shape[1], values.shape[2]])
+    start_idx = 0
+    years = []
     for i in range(len(time)-1):
-        if time[i].month != time[i+1].month:
-            month_times.append(datetime(time[i].year, time[i].month, 1))  # add this month to new datetimes list
-            month_values = values[month_idx:i, :, :].sum(axis=0)  # sum all the values from each day of that month
-            month_values = month_values[newaxis, :, :]
-            monthly_values = np.concatenate((monthly_values, month_values))
-            month_idx = i + 1
-    monthly_values = monthly_values[1:, :, :]
-    return monthly_values, month_times
+        if time[i].month == dry_month_end and time[i+1].month == wet_month_start:
+            start_idx = i+1
+            years.append(time[i].year)
+        elif time[i].month == wet_month_end and time[i+1].month == dry_month_start:
+            end_idx = i+1
+            period_values = values[start_idx:end_idx, :, :].sum(axis=0)  # sum values from each day of 6 mo period
+            period_values = period_values[newaxis, :, :]
+            six_month_values = np.concatenate((six_month_values, period_values))
+    six_month_values = six_month_values[1:, :, :]
+    return six_month_values, years
 
 
 if __name__ == '__main__':
