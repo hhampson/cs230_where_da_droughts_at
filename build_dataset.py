@@ -6,7 +6,7 @@ This script is for building the dataset.
 """
 
 import numpy as np
-from data import precipitation, drought_index
+from data import precipitation, drought_index, temperature
 
 
 # Extract data from drought index script
@@ -27,6 +27,11 @@ def main():
     precipitation_lon = precipitation.LON
 
     # Extract data from temperature script
+    min_temperature_values_large = temperature.SIX_MONTH_VALUES_TMIN
+    max_temperature_values_large = temperature.SIX_MONTH_VALUES_TMAX
+    temperature_years = temperature.YEARS
+    temperature_lat = temperature.LAT
+    temperature_lon = temperature.LON
 
     # Extract data from soil moisture script
 
