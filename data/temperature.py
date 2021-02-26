@@ -1,5 +1,4 @@
 # import packages
-get_ipython().run_line_magic('matplotlib', 'inline')
 from scipy.io import netcdf
 from netCDF4 import Dataset as NetCDFFile
 import pyproj
