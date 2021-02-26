@@ -1,6 +1,8 @@
 """
 Authors: Bennett Bolen, Hannah Hampson, Mo Sodwatana
 February 24, 2021
+
+This script is for building the dataset.
 """
 
 import numpy as np
