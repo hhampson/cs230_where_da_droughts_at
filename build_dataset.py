@@ -7,7 +7,7 @@ This script is for building the dataset.
 
 import numpy as np
 from data import precipitation, drought_index, temperature
-
+from tempfile import TemporaryFile
 
 # Extract data from drought index script
 DI_VALUES = drought_index.SIX_MONTH_VALUES
@@ -35,12 +35,15 @@ def main():
 
     # Extract data from soil moisture script
 
+    
     # Downsample input variables to fit drought index resolution
     precip = downsample(precipitation_lat, precipitation_lon, precipitation_values_large, precipitation_years, 'sum')
+    min_temp = downsample(temperature_lat, temperature_lon, min_temperature_values_large, temperature_years, 'avg')
+    max_temp = downsample(temperature_lat, temperature_lon, max_temperature_values_large, temperature_years, 'avg')
 
     y = build_y(DI_VALUES)
-    # x = build_x()
-    return y
+    x = build_x(precip,man_temp,min_temp,soil_moisture)
+    return y,x
 
 
 def downsample(var_lat, var_lon, var_values_large, var_years, method):
@@ -88,11 +91,11 @@ def build_y(di_values):
     Each lat, lon, during one year, corresponds to one training example.
     """
     m = di_values.shape[0] * di_values.shape[1] * di_values.shape[2] # number of training examples
-    y = np.zeros((1, 1))
-    for year_idx in range(len(di_values.shape[0])):
+    y = {}
+    for year_idx in range(0,di_values.shape[0]):
         new_vals = np.reshape(di_values[year_idx, :, :], (1, di_values.shape[1] * di_values.shape[2]))
-        y = np.concatenate([y, new_vals])
-    y = y[1:, :, :]
+        y[year_idx] = new_vals
+    y = np.concatenate([y[year_idx] for year_idx in range(di_values.shape[0])],axis=1)
     assert y.shape == (1, m)
     return y
 
@@ -101,16 +104,20 @@ def build_x(precip, max_temp, min_temp, soil_moisture):
     m = DI_VALUES.shape[0] * DI_VALUES.shape[1] * DI_VALUES.shape[2]  # number of training examples
     x = np.zeros(NUM_VARS, 1)
     grid_area = DI_VALUES.shape[1] * DI_VALUES.shape[2]
-    for year_idx in range(len(DI_VALUES.shape[0])):
+    for year_idx in range(0,DI_VALUES.shape[0]):
         precip_row = np.reshape(precip[year_idx, :, :], (1, grid_area))
         max_temp_row = np.reshape(max_temp[year_idx, :, :], (1, grid_area))
         min_temp_row = np.reshape(min_temp[year_idx, :, :], (1, grid_area))
         soil_moisture_row = np.reshape(soil_moisture[year_idx, :, :], (1, grid_area))
-        new_vals = [precip_row, max_temp_row, min_temp_row, soil_moisture_row]
-        x = np.concatenate([x, new_vals])
-    x = x[1:, :, :]
+        new_vals = [precip_row, max_temp_row, min_temp_row]
+        x[year_idx] = new_vals
+    x = np.concatenate([x[year_idx] for year_idx in range(DI_VALUES.shape[0])],axis=2)
+    x = np.reshape(x,(NUM_VARS,m))
     assert x.shape == (NUM_VARS, m)
     return x
 
 
-Y = main()
+Y,X = main()
+outfile = TemporaryFile()
+np.save(outfile,Y)
+np.save(outfile,X)

@@ -84,7 +84,7 @@ def extract_times(values, time):
     six_month_values = np.empty([1, values.shape[1], values.shape[2]])
     years = []
     for i in range(start_idx, len(time)):
-        while time[i].year < (year_end + 2):  # so we don't exceed time frame we care about  # <------ change to if
+        if time[i].year < (year_end + 2):  # so we don't exceed time frame we care about
             if time[i].month == dry_month_end:  # find six month SPEI corresponding to dry 6 month period
                 years.append(time[i].year)
                 period_values = values[i, :, :]
