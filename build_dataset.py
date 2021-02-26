@@ -102,7 +102,7 @@ def build_y(di_values):
 
 def build_x(precip, max_temp, min_temp, soil_moisture):
     m = DI_VALUES.shape[0] * DI_VALUES.shape[1] * DI_VALUES.shape[2]  # number of training examples
-    x = np.zeros(NUM_VARS, 1)
+    x = {}
     grid_area = DI_VALUES.shape[1] * DI_VALUES.shape[2]
     for year_idx in range(0,DI_VALUES.shape[0]):
         precip_row = np.reshape(precip[year_idx, :, :], (1, grid_area))
