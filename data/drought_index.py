@@ -1,9 +1,15 @@
 """
 Authors: Bennett Bolen, Hannah Hampson, Mo Sodwatana
 February 24, 2021
-"""
 
-# TODO: downscale temporally extracting correct 6 month periods corresponding to our years
+This script accounts for the drought index data as y values for our model. It processes Standardized Precipitation-
+Evapotranspiration Index (SPEI) gridded data, and pulls out the time and area values of interest (over California), and
+outputs a 4d array with dimensions (time, lat, lon). The data is already in a mean 6 month values, so this script pulls
+out those values at the end of our "dry" periods that we are trying to predict with our model.
+
+The output is our 4d matrix of average SPEI values for our 6 month dry seasons, a list of corresponding years, a
+latitude numpy array, and longitude numpy array.
+"""
 
 import netCDF4 as nc
 import numpy as np
@@ -33,9 +39,14 @@ def view_data(filename):
 
 
 def extract_data(filename):
+    """
+    Open up SPEI netcdf file and extract content, including clipping to the
+    latitude and longitude limits of interest (specified in variables.py). Also
+    converts fill values to "None".
+    """
     data = nc.Dataset(filename)
     values = data.variables['spei'][:]  # SPEI
-    values[values > 2] = None
+    values[values > 2] = None  # convert fill values (1e30) to None
     time_days = data.variables['time'][:]  # days since 1901-01-01
     time = convert_time(time_days)
     lat = data.variables['lat'][:]
