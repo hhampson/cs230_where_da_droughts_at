@@ -95,7 +95,7 @@ def build_y(di_values):
     for year_idx in range(0,di_values.shape[0]):
         new_vals = np.reshape(di_values[year_idx, :, :], (1, di_values.shape[1] * di_values.shape[2]))
         y[year_idx] = new_vals
-    y = np.concatenate([y[year_idx] for year_idx in range(di_values.shape[0])],axis=1)
+    y = np.concatenate([y[year_idx] for year_idx in range(0,di_values.shape[0])],axis=1)
     assert y.shape == (1, m)
     return y
 
@@ -111,7 +111,7 @@ def build_x(precip, max_temp, min_temp, soil_moisture):
         soil_moisture_row = np.reshape(soil_moisture[year_idx, :, :], (1, grid_area))
         new_vals = [precip_row, max_temp_row, min_temp_row]
         x[year_idx] = new_vals
-    x = np.concatenate([x[year_idx] for year_idx in range(DI_VALUES.shape[0])],axis=2)
+    x = np.concatenate([x[year_idx] for year_idx in range(0,DI_VALUES.shape[0])],axis=2)
     x = np.reshape(x,(NUM_VARS,m))
     assert x.shape == (NUM_VARS, m)
     return x
