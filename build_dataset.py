@@ -42,7 +42,7 @@ def main():
     max_temp = downsample(temperature_lat, temperature_lon, max_temperature_values_large, temperature_years, 'avg')
 
     y = build_y(DI_VALUES)
-    x = build_x(precip,man_temp,min_temp,soil_moisture)
+    x = build_x(precip,max_temp,min_temp,soil_moisture)
     return y,x
 
 
