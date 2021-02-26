@@ -17,7 +17,7 @@ import netCDF4 as nc
 from ftplib import FTP
 import numpy as np
 from numpy import newaxis
-from datetime import date, datetime
+from datetime import date
 from dateutil.relativedelta import relativedelta
 from variables import *  # imports variables such as lat_lims, lon_lims
 
@@ -123,7 +123,7 @@ def convert_to_six_month(values, time):
             period_values = values[start_idx:end_idx, :, :].sum(axis=0)  # sum values from each day of 6 mo period
             period_values = period_values[newaxis, :, :]
             six_month_values = np.concatenate((six_month_values, period_values))
-    six_month_values = six_month_values[1:, :, :]
+    six_month_values = six_month_values[1:, :, :]  # cut off empty first layer
     return six_month_values, years
 
 
