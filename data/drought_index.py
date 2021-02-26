@@ -58,6 +58,10 @@ def extract_data(filename):
 
 
 def get_area_coords(coordinate_list, lims):
+    """
+    Given an array of coordinates and coordinate limits specified, return the
+    index corresponding to those limits and the clipped array.
+    """
     idx = []
     for lim in lims:
         minimum = float("inf")
@@ -82,6 +86,9 @@ def convert_time(time_days):
 
 
 def extract_times(values, time):
+    """
+    Extract data for 6 month periods we're interested in.
+    """
     start_idx = find_start_idx(time)  # start at the year we care about, year_start
     six_month_values = np.empty([1, values.shape[1], values.shape[2]])
     years = []
@@ -96,6 +103,9 @@ def extract_times(values, time):
 
 
 def find_start_idx(time):
+    """
+    Find index of time corresponding to our start year (from variables.py).
+    """
     for i in range(len(time)):
         if time[i].year == year_start:
             return i
