@@ -6,15 +6,14 @@ from os.path import isfile, join
 
 def main():
     filenames = list_files()
+
     full_data, averaged_data, lats, lons = combine_arrays(filenames)
 
     lat_lims = [42, 31]  # latitude range over California
     lon_lims = [-125, -114]  # longitude range over California
 
-    trimmed_data, trimmed_lats, trimmed_lons = trim_data(lat_lims, lon_lims, averaged_data, lats, lons)
-    np.save("test_array", trimmed_data)
-    np.save("lats", trimmed_lats)
-    np.save("lons", trimmed_lons)
+    global trimmed_data_SM, trimmed_lats_SM, trimmed_lons_SM
+    trimmed_data_SM, trimmed_lats_SM, trimmed_lons_SM = trim_data(lat_lims, lon_lims, averaged_data, lats, lons)
 
 
 def list_files(path='.'):
@@ -82,21 +81,6 @@ def get_area_coords(coordinate_list, lims):
         idx.append(final_value)
     area_coords = coordinate_list[idx[0]: idx[1]]
     return area_coords, idx
-
-
-def downscale(area_values, area_lat, area_lon, spei_lat, spei_lon, method):
-  grid_size = spei_lat[0]-spei_lat[1]
-  values_grid = np.zeros((len(spei_lat), len(spei_lon)))
-  for lat_idx in range(len(spei_lat)):
-    for lon_idx in range(len(spei_lon)):
-      _, fine_lat_idx = get_area_coords(area_lat, [(spei_lat[lat_idx] - 0.5 * grid_size), (spei_lat[lat_idx] + 0.5 * grid_size)])
-      _, fine_lon_idx = get_area_coords(area_lon, [(spei_lon[lon_idx] - 0.5 * grid_size), (spei_lon[lon_idx] + 0.5 * grid_size)])
-      if method == 'sum':
-        value = area_values[fine_lat_idx[1]:fine_lat_idx[0], fine_lon_idx[0]:fine_lon_idx[1]].sum()
-      if method == 'avg':
-        value = np.mean(area_values[fine_lat_idx[1]:fine_lat_idx[0], fine_lon_idx[0]:fine_lon_idx[1]], axis=None)
-      values_grid[lat_idx, lon_idx] = float(value)
-  return values_grid
 
 
 if __name__ == '__main__':
