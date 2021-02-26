@@ -14,18 +14,9 @@ latitude numpy array, and longitude numpy array.
 import netCDF4 as nc
 import numpy as np
 from numpy import newaxis
-from variables import *  # imports variables such as lat_lims, lon_lims
+from data.variables import *  # imports variables such as lat_lims, lon_lims
 from datetime import date
 from dateutil.relativedelta import relativedelta
-
-
-def main():
-    # Reference SPEI netcdf file
-    filename = '/Users/hannahhampson/OneDrive_Stanford_Old/OneDrive - Stanford/CS_230/project/pycharm/data/spei06.nc'
-    # view_data(filename)
-    total_values, lat, lon, time, values = extract_data(filename)
-    six_month_values, years = extract_times(values, time)
-    return six_month_values, years, lat, lon
 
 
 def view_data(filename):
@@ -93,11 +84,12 @@ def extract_times(values, time):
     six_month_values = np.empty([1, values.shape[1], values.shape[2]])
     years = []
     for i in range(start_idx, len(time)):
-        if time[i].month == dry_month_end:  # find six month SPEI corresponding to dry 6 month period
-            years.append(time[i].year)
-            period_values = values[i, :, :]
-            period_values = period_values[newaxis, :, :]
-            six_month_values = np.concatenate((six_month_values, period_values))
+        while time[i].year < (year_end + 2):  # so we don't exceed time frame we care about
+            if time[i].month == dry_month_end:  # find six month SPEI corresponding to dry 6 month period
+                years.append(time[i].year)
+                period_values = values[i, :, :]
+                period_values = period_values[newaxis, :, :]
+                six_month_values = np.concatenate((six_month_values, period_values))
     six_month_values = six_month_values[1:, :, :]  # cut off empty first layer
     return six_month_values, years
 
@@ -107,9 +99,13 @@ def find_start_idx(time):
     Find index of time corresponding to our start year (from variables.py).
     """
     for i in range(len(time)):
-        if time[i].year == year_start:
+        if time[i].year == year_start + 1:  # add one because dry season here lags by 6 months, which is in next yr
             return i
 
 
-if __name__ == '__main__':
-    main()
+# Variables of interest for build_dataset.py: six_month_values, years, lat, lon
+# Reference SPEI netcdf file
+FILENAME = '/Users/hannahhampson/OneDrive_Stanford_Old/OneDrive - Stanford/CS_230/project/pycharm/data/spei06.nc'
+# view_data(filename)
+TOTAL_VALUES, LAT, LON, TIME, VALUES = extract_data(FILENAME)
+SIX_MONTH_VALUES, YEARS = extract_times(VALUES, TIME)
