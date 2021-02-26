@@ -13,15 +13,7 @@ import numpy as np
 import ftplib
 import os
 
-
-# In[3]:
-
-
 from data.variables import *  # imports variables such as lat_lims, lon_lims
-
-
-# In[38]:
-
 
 def view_data(filename):
     """
@@ -99,10 +91,6 @@ def average_temp_data(area_value,from_year,to_year):
         area_average = np.concatenate((area_average,np.reshape(area,(1,area_value.shape[1], area_value.shape[2]))))
     return area_average
 
-
-# In[10]:
-
-
 # convert start and end year variable input to using input
 from_year = year_start
 to_year = year_end + 1
@@ -130,10 +118,6 @@ for year in range(from_year, to_year+1, 1): # to include to_year
             data = FTPimprort(FILE_NAME)
             dict_tmin[year] = extract_temp_data(data, lat_lims_var, lon_lims_var, data_type)
 
-
-# In[45]:
-
-
 # combine data from all years
 tmin_all = np.concatenate([dict_tmin[year]['area_values'] for year in range(from_year, to_year+1)])
 tmax_all = np.concatenate([dict_tmax[year]['area_values'] for year in range(from_year, to_year+1)])
@@ -145,16 +129,4 @@ SIX_MONTH_VALUES_TMAX = average_temp_data(tmax_all,from_year,to_year)
 LAT = dict_tmin[from_year]['area_lat'][::-1]
 LON = dict_tmin[from_year]['area_lon']-360
 YEARS = np.arange(from_year, to_year)
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
 
