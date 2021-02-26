@@ -19,16 +19,9 @@ import numpy as np
 from numpy import newaxis
 from datetime import date
 from dateutil.relativedelta import relativedelta
-from variables import *  # imports variables such as lat_lims, lon_lims
+from data.variables import *  # imports variables such as lat_lims, lon_lims
 
 
-def main():
-    filename = 'X128.12.122.45.54.19.46.11.nc'  # retrieved from the NOAA website from specifying subset boundaries
-    # download_data(filename)
-    # view_data(filename)
-    total_values, lat, lon, time, values = extract_data(filename)
-    six_month_values, years = convert_to_six_month(values, time)
-    return six_month_values, years, lat, lon
 
 
 def download_data(filename):
@@ -127,5 +120,9 @@ def convert_to_six_month(values, time):
     return six_month_values, years
 
 
-if __name__ == '__main__':
-    main()
+# Variables of interest for build_dataset.py: six_month_values, years, lat, lon
+FILENAME = 'data/X128.12.122.45.54.19.46.11.nc'  # retrieved from the NOAA website from specifying subset boundaries
+# download_data(filename)
+# view_data(filename)
+TOTAL_VALUES, LAT, LON, TIME, VALUES = extract_data(FILENAME)
+SIX_MONTH_VALUES, YEARS = convert_to_six_month(VALUES, TIME)
