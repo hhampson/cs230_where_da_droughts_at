@@ -2,15 +2,13 @@ import numpy as np
 import h5py
 from os import listdir
 from os.path import isfile, join
+from data.variables import *
 
 
 def main():
     filenames = list_files()
 
     full_data, averaged_data, lats, lons = combine_arrays(filenames)
-
-    lat_lims = [42, 31]  # latitude range over California
-    lon_lims = [-125, -114]  # longitude range over California
 
     global trimmed_data_SM, trimmed_lats_SM, trimmed_lons_SM
     trimmed_data_SM, trimmed_lats_SM, trimmed_lons_SM = trim_data(lat_lims, lon_lims, averaged_data, lats, lons)
@@ -59,9 +57,9 @@ def import_file(filename):
         return surface, lats, lons
 
 
-def trim_data(lat_lim, lon_lim, area, lats, lons):
-    lat_coords, lat_idx = get_area_coords(lats, lat_lim)
-    long_coords, lon_idx = get_area_coords(lons, lon_lim)
+def trim_data(area, lats, lons):
+    lat_coords, lat_idx = get_area_coords(lats, lat_lims)
+    long_coords, lon_idx = get_area_coords(lons, lon_lims)
 
     trimmed_data = area[0, lat_idx[0]:lat_idx[1], lon_idx[0]:lon_idx[1]]
     trimmed_lats = lats[lat_idx[0]:lat_idx[1]]
