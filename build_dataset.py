@@ -118,6 +118,7 @@ def build_x(precip, max_temp, min_temp, soil_moisture):
 
 
 Y,X = main()
+Y = np.array(Y)
 outfile = TemporaryFile()
-np.save(outfile,Y)
-np.save(outfile,X)
+np.save('Y',Y)
+np.save('X',X)
