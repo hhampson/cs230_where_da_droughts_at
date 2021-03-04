@@ -1,4 +1,4 @@
-lat_lims = [42, 32.5]  # latitude range over California
+lat_lims = [49, 32.5]  # latitude range over California
 lon_lims = [-125, -114]  # longitude range over California
 
 dry_month_start = 5  # start of "dry" season of prediction beginning of May
