@@ -13,6 +13,7 @@ numpy array, and longitude numpy array.
 """
 
 
+import os
 import netCDF4 as nc
 from ftplib import FTP
 import numpy as np
@@ -28,13 +29,14 @@ def download_data(filename):
     """
     Open up NOAA ftp server and download precipitation data. Unnecessary
     step if file already downloaded. After this step the netcdf file should
-    be in the current folder.
+    be in the location specified in NEW_FILENAME.
     """
     ftp = FTP('ftp2.psl.noaa.gov')
     ftp.login()
     ftp.cwd('/Public/www')
     file = open(filename, 'wb')
     ftp.retrbinary('RETR ' + filename, file.write)
+    os.rename(filename, NEW_FILENAME)
     ftp.quit()
 
 
@@ -120,9 +122,13 @@ def convert_to_six_month(values, time):
     return six_month_values, years
 
 
+# v1 filename: X128.12.122.45.54.19.46.11.nc
+# v2 filename:
+FILENAME = 'X128.12.122.126.61.19.40.47.nc'  # name of file in NOAA server, w/ temporal and spatial boundaries specified
+NEW_FILENAME = "~/data/precipitation.nc"  # store file to data folder in instance
+
+download_data(FILENAME)
+# view_data(NEW_FILENAME)
 # Variables of interest for build_dataset.py: six_month_values, years, lat, lon
-FILENAME = 'data/X128.12.122.45.54.19.46.11.nc'  # retrieved from the NOAA website from specifying subset boundaries
-# download_data(filename)
-# view_data(filename)
-TOTAL_VALUES, LAT, LON, TIME, VALUES = extract_data(FILENAME)
+TOTAL_VALUES, LAT, LON, TIME, VALUES = extract_data(NEW_FILENAME)
 SIX_MONTH_VALUES, YEARS = convert_to_six_month(VALUES, TIME)
