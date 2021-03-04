@@ -105,7 +105,7 @@ def find_start_idx(time):
 
 # Variables of interest for build_dataset.py: six_month_values, years, lat, lon
 # Reference SPEI netcdf file
-FILENAME = '/Users/hannahhampson/OneDrive_Stanford_Old/OneDrive - Stanford/CS_230/project/pycharm/data/spei06.nc'
+FILENAME = '~/data/spei06.nc'
 # view_data(filename)
 TOTAL_VALUES, LAT, LON, TIME, VALUES = extract_data(FILENAME)
 SIX_MONTH_VALUES, YEARS = extract_times(VALUES, TIME)
