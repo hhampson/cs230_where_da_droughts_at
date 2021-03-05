@@ -18,8 +18,8 @@ def main():
     x = np.load("X.npy")
     y = np.load("Y.npy")
     threshold = 0.00000001
-    x[x < threshold] = threshold_for_bug
-    y[y < threshold] = threshold_for_bug
+    x[x < threshold] = threshold
+    y[y < threshold] = threshold
     x = np.nan_to_num(x,nan = 0)
     y = np.nan_to_num(y,nan = 0)
 
