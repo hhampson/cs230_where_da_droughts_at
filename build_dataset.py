@@ -26,9 +26,9 @@ def main():
     precipitation_lat = precipitation.LAT
     precipitation_lon = precipitation.LON
 
-    # Extract data from temperature script
-    min_temperature_values_large = temperature.SIX_MONTH_VALUES_TMIN
-    max_temperature_values_large = temperature.SIX_MONTH_VALUES_TMAX
+    # Extract data from temperature script, does not need to be downsampled
+    min_temp = temperature.SIX_MONTH_VALUES_TMIN
+    max_temp = temperature.SIX_MONTH_VALUES_TMAX
     temperature_years = temperature.YEARS
     temperature_lat = temperature.LAT
     temperature_lon = temperature.LON
