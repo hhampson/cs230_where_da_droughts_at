@@ -6,7 +6,7 @@ import numpy as np
 import ftplib
 import os
 
-from variables import *  # imports variables such as lat_lims, lon_lims
+from data.variables import *  # imports variables such as lat_lims, lon_lims
 
 
 def view_data(filename):
