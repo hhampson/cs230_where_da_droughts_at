@@ -5,9 +5,12 @@ February 24, 2021
 This script is for building the dataset.
 """
 
+
 import numpy as np
-from data import precipitation, drought_index, temperature
+from data import precipitation, drought_index, temperature, soil_moisture
 from tempfile import TemporaryFile
+import pandas as pd
+
 
 # Extract data from drought index script
 DI_VALUES = drought_index.SIX_MONTH_VALUES
@@ -34,14 +37,21 @@ def main():
     temperature_lon = temperature.LON
 
     # Extract data from soil moisture script
-
+    sm_values_large = soil_moisture.SIX_MONTH_VALUES
+    sm_years = [2015, 2016, 2017]
+    sm_lat = soil_moisture.LAT
+    sm_lon = soil_moisture.LON
     
     # Downsample input variables to fit drought index resolution
     precip = downsample(precipitation_lat, precipitation_lon, precipitation_values_large, precipitation_years, 'sum')
+    sm = downsample(sm_lat, sm_lon, sm_values_large, sm_years, 'avg')
     
-    y = build_y(DI_VALUES)
-    x = build_x(precip,max_temp,min_temp,soil_moisture)
-    return y,x
+    y_nans = build_y(DI_VALUES)
+    x_nans = build_x(precip,max_temp,min_temp,sm)
+
+    # Drop any examples that have NaN values
+    x, y = drop_nans(x_nans, y_nans)
+    return y, x
 
 
 def downsample(var_lat, var_lon, var_values_large, var_years, method):
@@ -93,12 +103,12 @@ def build_y(di_values):
     for year_idx in range(0,di_values.shape[0]):
         new_vals = np.reshape(di_values[year_idx, :, :], (1, di_values.shape[1] * di_values.shape[2]))
         y[year_idx] = new_vals
-    y = np.concatenate([y[year_idx] for year_idx in range(0,di_values.shape[0])],axis=1)
+    y = np.concatenate([y[year_idx] for year_idx in range(0, di_values.shape[0])], axis=1)
     assert y.shape == (1, m)
     return y
 
 
-def build_x(precip, max_temp, min_temp, soil_moisture):
+def build_x(precip, max_temp, min_temp, sm):
     m = DI_VALUES.shape[0] * DI_VALUES.shape[1] * DI_VALUES.shape[2]  # number of training examples
     x = {}
     grid_area = DI_VALUES.shape[1] * DI_VALUES.shape[2]
@@ -106,17 +116,39 @@ def build_x(precip, max_temp, min_temp, soil_moisture):
         precip_row = np.reshape(precip[year_idx, :, :], (1, grid_area))
         max_temp_row = np.reshape(max_temp[year_idx, :, :], (1, grid_area))
         min_temp_row = np.reshape(min_temp[year_idx, :, :], (1, grid_area))
-        soil_moisture_row = np.reshape(soil_moisture[year_idx, :, :], (1, grid_area))
-        new_vals = [precip_row, max_temp_row, min_temp_row]
+        sm_row = np.reshape(sm[year_idx, :, :], (1, grid_area))
+        new_vals = [precip_row, max_temp_row, min_temp_row, sm_row]
         x[year_idx] = new_vals
-    x = np.concatenate([x[year_idx] for year_idx in range(0,DI_VALUES.shape[0])],axis=2)
-    x = np.reshape(x,(NUM_VARS,m))
+    x = np.concatenate([x[year_idx] for year_idx in range(0, DI_VALUES.shape[0])], axis=2)
+    x = np.reshape(x, (NUM_VARS, m))
     assert x.shape == (NUM_VARS, m)
     return x
 
 
-Y,X = main()
+def drop_nans(x_nans, y_nans):
+    """
+    Take in X and Y matrices and throws out training examples with NaN values in them.
+    Does so by creating a pandas dataframe from X and Y matrices then using
+    dropna().
+    """
+    # build pandas dataframe
+    df_nans = pd.DataFrame(np.concatenate((x_nans, y_nans)))
+    df_no_nans = df_nans.dropna(axis=1)  # drop examples with any values = nan
+    array_no_nans = np.array(df_no_nans)  # convert to numpy array
+    x_no_nans = array_no_nans[0:4, :]
+    y_no_nans = array_no_nans[-1, :].reshape(1, -1)
+
+    assert x_no_nans.shape[0] == NUM_VARS
+    assert x_no_nans.shape[1] == y_no_nans.shape[1]  # = m
+    m = x_no_nans.shape[1]
+    print("Number of training examples: " + str(m))
+    return x_no_nans, y_no_nans
+
+
+Y, X = main()
 Y = np.array(Y)
 outfile = TemporaryFile()
-np.save('Y',Y)
-np.save('X',X)
+# np.save('Y',Y)  # first test
+# np.save('X',X)  # first test
+np.save('Y_v2', Y)  # version 2
+np.save('X_v2', X)  # version 2
