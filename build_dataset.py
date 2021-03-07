@@ -41,6 +41,8 @@ def main():
     sm_years = [2015, 2016, 2017]
     sm_lat = soil_moisture.LAT
     sm_lon = soil_moisture.LON
+
+    assert len(precipitation_years) == len(temperature_years) == len(sm_years) == len(DI_YEARS)
     
     # Downsample input variables to fit drought index resolution
     precip = downsample(precipitation_lat, precipitation_lon, precipitation_values_large, precipitation_years, 'sum')
