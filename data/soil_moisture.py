@@ -134,4 +134,8 @@ def get_area_coords(coordinate_list, lims):
 
 SIX_MONTH_VALUES, LAT, LON = build_sm_array()
 
+np.save("SIX_MONTH_VALUES.npy", SIX_MONTH_VALUES)
+np.save("LAT.npy", LAT)
+np.save("LON.npy", LON)
+
 
