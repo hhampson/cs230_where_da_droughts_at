@@ -9,7 +9,7 @@ def build_sm_array():
     # Builds the soil moisture dtaset from the individual data files. The .h5 files should be located in the folder
     # specified by rootdir, with data from each year in a separate subfolder.
 
-    rootdir = 'C:/Users/Bennett/Documents/School/Stanford/4. CS230 Project/Test Data/'
+    rootdir = os.getcwd()
     idx = 0
     dirs = os.listdir(rootdir)
     # path = rootdir + dirs[0]
@@ -17,24 +17,30 @@ def build_sm_array():
     #
     # h5_files = [f for f in listdir(path) if f.endswith(".h5")]
     # print(h5_files)
-    for idx in range(len(dirs)):
+    if not dirs:
+        trimmed_data, trimmed_lats, trimmed_lons = extract_one_year(rootdir)
 
-        if idx == 0:
-            trimmed_data, trimmed_lats, trimmed_lons = extract_one_year(rootdir + dirs[idx])
-            print(trimmed_data.shape)
-        else:
-            trimmed_data_temp, trimmed_lats_temp, trimmed_lons_temp = extract_one_year(rootdir + dirs[idx])
-            trimmed_data = np.concatenate((trimmed_data, trimmed_data_temp))
+    else:
 
-            trimmed_lats = np.concatenate((trimmed_lats, trimmed_lats_temp), axis=1)
-            trimmed_lons = np.concatenate((trimmed_lons, trimmed_lons_temp))
+        for idx in range(len(dirs)):
 
-            if np.sum(trimmed_lats[:, idx-1] != trimmed_lats[:, idx]):
-                raise Exception("Latitudes don't match. File Number: " + str(idx+1))
+            if idx == 0:
+                trimmed_data, trimmed_lats, trimmed_lons = extract_one_year(rootdir + dirs[idx])
+                print(trimmed_data.shape)
+            else:
+                trimmed_data_temp, trimmed_lats_temp, trimmed_lons_temp = extract_one_year(rootdir + dirs[idx])
+                trimmed_data = np.concatenate((trimmed_data, trimmed_data_temp))
 
-            if np.sum(trimmed_lons[idx-1, :] != trimmed_lons[idx, :]):
-                raise Exception("Longitudes don't match. File Number" + str(idx+1))
-        idx += 1
+                trimmed_lats = np.concatenate((trimmed_lats, trimmed_lats_temp), axis=1)
+                trimmed_lons = np.concatenate((trimmed_lons, trimmed_lons_temp))
+
+                if np.sum(trimmed_lats[:, idx-1] != trimmed_lats[:, idx]):
+                    raise Exception("Latitudes don't match. File Number: " + str(idx+1))
+
+                if np.sum(trimmed_lons[idx-1, :] != trimmed_lons[idx, :]):
+                    raise Exception("Longitudes don't match. File Number" + str(idx+1))
+            idx += 1
+
     return trimmed_data, trimmed_lats, trimmed_lons
 
 
