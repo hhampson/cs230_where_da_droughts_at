@@ -9,19 +9,17 @@ def build_sm_array():
     # Builds the soil moisture dtaset from the individual data files. The .h5 files should be located in the folder
     # specified by rootdir, with data from each year in a separate subfolder.
 
-    rootdir = os.getcwd()
-    idx = 0
-    dirs = os.listdir(rootdir)
-    # path = rootdir + dirs[0]
-    # print(listdir(path))
-    #
-    # h5_files = [f for f in listdir(path) if f.endswith(".h5")]
-    # print(h5_files)
+    rootdir = os.getcwd() + "/"
+    print(rootdir)
+
+    dirs = listdirs(rootdir)
+    print(dirs)
+
     if not dirs:
         trimmed_data, trimmed_lats, trimmed_lons = extract_one_year(rootdir)
 
     else:
-
+        print("hi")
         for idx in range(len(dirs)):
 
             if idx == 0:
@@ -43,6 +41,9 @@ def build_sm_array():
 
     return trimmed_data, trimmed_lats, trimmed_lons
 
+
+def listdirs(folder):
+    return [d for d in os.listdir(folder) if os.path.isdir(os.path.join(folder, d))]
 
 def extract_one_year(path):
     # Extracts all the .h5 files in one folder and combines them to an averaged output for that year
@@ -139,6 +140,8 @@ def get_area_coords(coordinate_list, lims):
 
 
 SIX_MONTH_VALUES, LAT, LON = build_sm_array()
+
+
 
 np.save("SIX_MONTH_VALUES.npy", SIX_MONTH_VALUES)
 np.save("LAT.npy", LAT)
