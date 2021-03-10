@@ -9,19 +9,17 @@ def build_sm_array():
     # Builds the soil moisture dtaset from the individual data files. The .h5 files should be located in the folder
     # specified by rootdir, with data from each year in a separate subfolder.
 
-    rootdir = os.getcwd()
-    idx = 0
-    dirs = os.listdir(rootdir)
-    # path = rootdir + dirs[0]
-    # print(listdir(path))
-    #
-    # h5_files = [f for f in listdir(path) if f.endswith(".h5")]
-    # print(h5_files)
+    rootdir = os.getcwd() + "/"
+    print(rootdir)
+
+    dirs = listdirs(rootdir)
+    print(dirs)
+
     if not dirs:
-        trimmed_data, trimmed_lats, trimmed_lons = extract_one_year(rootdir + "/")
+        trimmed_data, trimmed_lats, trimmed_lons = extract_one_year(rootdir)
 
     else:
-
+        print("hi")
         for idx in range(len(dirs)):
 
             if idx == 0:
@@ -43,6 +41,9 @@ def build_sm_array():
 
     return trimmed_data, trimmed_lats, trimmed_lons
 
+
+def listdirs(folder):
+    return [d for d in os.listdir(folder) if os.path.isdir(os.path.join(folder, d))]
 
 def extract_one_year(path):
     # Extracts all the .h5 files in one folder and combines them to an averaged output for that year
@@ -76,21 +77,26 @@ def combine_arrays(filenames, path):
     # arrays must be of the same dimensions
 
     for i in range(len(filenames)):
-
+        print(i)
         if i == 0:
-            [combined_data, lats, lons] = import_file(path + "/" + filenames[i])
+            [data_temp, lats, lons] = import_file(path + "/" + filenames[i])
+            combined_data = np.zeros((len(filenames), data_temp.shape[0], data_temp.shape[0]))
 
         else:
-            [surface, lats_temp, lons_temp] = import_file(path + "/" + filenames[i])
-            combined_data = np.concatenate((combined_data, surface))
-            lats = np.concatenate((lats, lats_temp), axis=1)
-            lons = np.concatenate((lons, lons_temp))
+            [data_temp, lats_temp, lons_temp] = import_file(path + "/" + filenames[i])
+            #combined_data = np.concatenate((combined_data, surface))
+            # lats = np.concatenate((lats, lats_temp), axis=1)
+            # lons = np.concatenate((lons, lons_temp))
 
             if np.sum(lats[:, i-1] != lats[:, i]):
                 raise Exception("Latitudes don't match. File Number: " + str(i+1))
 
             if np.sum(lons[i-1, :] != lons[i, :]):
                 raise Exception("Longitudes don't match. File Number" + str(i+1))
+        print(data.shape)
+        print(combined_data.shape)
+        combined_data[i, :, :] = data_temp
+
 
     averaged_data = np.average(combined_data, weights=(combined_data < 100), axis=0)
     averaged_data = np.reshape(averaged_data, (1, averaged_data.shape[0], averaged_data.shape[1]))
@@ -140,8 +146,10 @@ def get_area_coords(coordinate_list, lims):
 
 SIX_MONTH_VALUES, LAT, LON = build_sm_array()
 
-np.save("SIX_MONTH_VALUES.npy", SIX_MONTH_VALUES)
-np.save("LAT.npy", LAT)
-np.save("LON.npy", LON)
+
+
+np.save("SIX_MONTH_VALUES_2years.npy", SIX_MONTH_VALUES)
+np.save("LAT_2years.npy", LAT)
+np.save("LON_2years.npy", LON)
 
 
