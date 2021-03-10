@@ -77,7 +77,7 @@ def combine_arrays(filenames, path):
     # arrays must be of the same dimensions
 
     for i in range(len(filenames)):
-
+        print(i)
         if i == 0:
             [combined_data, lats, lons] = import_file(path + "/" + filenames[i])
 
