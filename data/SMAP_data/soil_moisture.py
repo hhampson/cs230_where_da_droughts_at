@@ -118,7 +118,7 @@ def import_file(filename):
         lons = f["cell_lon"][0, :]
         lons = np.reshape(lons, (1, lons.shape[0]))
 
-        return surface, lats, lons
+        return surface.astype('float32'), lats, lons
 
 
 def trim_data(lat_lim, lon_lim, area, lats, lons):
