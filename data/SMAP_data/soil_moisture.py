@@ -150,7 +150,7 @@ def import_file(filename):
         # trimmed_lats = np.reshape(trimmed_lats, (trimmed_lats.shape[0], 1))
         # trimmed_lons = np.reshape(trimmed_lons, (1, trimmed_lons.shape[0]))
 
-        return trimmed_data, trimmed_lats, trimmed_lons
+        return data, lats, lons
 
 
 def trim_data(lat_idx, lon_idx, area, lats, lons):
