@@ -84,8 +84,8 @@ def combine_arrays(filenames, path):
         else:
             [surface, lats_temp, lons_temp] = import_file(path + "/" + filenames[i])
             combined_data = np.concatenate((combined_data, surface))
-            lats = np.concatenate((lats, lats_temp), axis=1)
-            lons = np.concatenate((lons, lons_temp))
+            # lats = np.concatenate((lats, lats_temp), axis=1)
+            # lons = np.concatenate((lons, lons_temp))
 
             if np.sum(lats[:, i-1] != lats[:, i]):
                 raise Exception("Latitudes don't match. File Number: " + str(i+1))
