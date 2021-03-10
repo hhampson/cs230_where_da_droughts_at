@@ -37,14 +37,13 @@ def extract_data(filename):
     """
     data = nc.Dataset(filename)
     values = data.variables['spei'][:]  # SPEI
-    values[values > 2] = None  # convert fill values (1e30) to None
     time_days = data.variables['time'][:]  # days since 1901-01-01
     time = convert_time(time_days)
     lat = data.variables['lat'][:]
     lon = data.variables['lon'][:]
     area_lat, idx_lat = get_area_coords(lat, lat_lims[::-1])  # reverse latitude limits
     area_lon, idx_lon = get_area_coords(lon, lon_lims)
-    area_values = values[:, idx_lat[0]:idx_lat[1], idx_lon[0]:idx_lon[1]]
+    area_values = values[:, idx_lon[0]:idx_lon[1], idx_lat[0]:idx_lat[1]]
     return values, area_lat, area_lon, time, area_values
 
 
