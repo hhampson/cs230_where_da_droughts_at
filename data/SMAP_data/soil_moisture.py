@@ -81,7 +81,7 @@ def combine_arrays(filenames, path):
         print("test")
         if i == 0:
             [data_temp, lats, lons] = import_file(path + "/" + filenames[i])
-            combined_data = np.zeros((len(filenames), data_temp.shape[0], data_temp.shape[0]))
+            combined_data = np.zeros((len(filenames), data_temp.shape[1], data_temp.shape[2]))
             print("test2")
 
         else:
