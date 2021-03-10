@@ -57,7 +57,7 @@ def extract_one_year(path):
     # lat_coords, lat_idx = get_area_coords(lats, lat_lims)
     # long_coords, lon_idx = get_area_coords(lons, lon_lims)
 
-    
+
     #
     # trimmed_data, trimmed_lats, trimmed_lons = trim_data(lat_lims, lon_lims, averaged_data, lats, lons)
     #
@@ -90,28 +90,43 @@ def combine_arrays(filenames, path):
         print(i)
         if i == 0:
             [data_temp, lats, lons] = import_file((path + "/" + filenames[i]), lat_idx, lon_idx)
-            combined_data = np.zeros((len(filenames), data_temp.shape[1], data_temp.shape[2]), dtype=np.float32)
+            lat_lims = [42, 31]  # latitude range over California
+            lon_lims = [-125, -114]  # longitude range over California
+            lat_coords, lat_idx = get_area_coords(lats, lat_lims)
+            long_coords, lon_idx = get_area_coords(lons, lon_lims)
+
+            trimmed_data, trimmed_lats, trimmed_lons = trim_data(lat_idx, lon_idx, data_temp, lats, lons)
+            trimmed_data = np.reshape(trimmed_data, (1, trimmed_data.shape[0], trimmed_data.shape[1]))
+            trimmed_lats = np.reshape(trimmed_lats, (trimmed_lats.shape[0], 1))
+            trimmed_lons = np.reshape(trimmed_lons, (1, trimmed_lons.shape[0]))
+
+            combined_data = np.zeros((len(filenames), trimmed_data.shape[1], trimmed_data.shape[2]), dtype=np.float32)
 
         else:
             [data_temp, lats_temp, lons_temp] = import_file((path + "/" + filenames[i]), lat_idx, lon_idx)
 
+            trimmed_data, trimmed_lats, trimmed_lons = trim_data(lat_idx, lon_idx, data_temp, lats, lons)
+            trimmed_data = np.reshape(trimmed_data, (1, trimmed_data.shape[0], trimmed_data.shape[1]))
+            lats_temp = np.reshape(trimmed_lats, (trimmed_lats.shape[0], 1))
+            lons_temp = np.reshape(trimmed_lons, (1, trimmed_lons.shape[0]))
 
             if np.sum(lats != lats_temp):
                 raise Exception("Latitudes don't match. File Number: " + str(i+1))
 
             if np.sum(lons != lons_temp):
                 raise Exception("Longitudes don't match. File Number" + str(i+1))
-            lats = lats_temp
-            lons = lons_temp
-            print(data_temp.shape)
+
+            trimmed_lats = lats_temp
+            trimmed_lons = lons_temp
+            print(trimmed_data.shape)
             print(combined_data.shape)
-        combined_data[i, :, :] = data_temp
+        combined_data[i, :, :] = trimmed_data
 
     averaged_data = np.average(combined_data, weights=(combined_data > -100), axis=0)
     averaged_data = np.reshape(averaged_data, (1, averaged_data.shape[0], averaged_data.shape[1]))
 
     # return combined_data, averaged_data, lats[:, 0], lons[0, :]
-    return averaged_data, lats[:, 0], lons[0, :]
+    return averaged_data, trimmed_lats[:, 0], trimmed_lons[0, :]
 
 
 def import_file(filename, lat_idx, lon_idx):
@@ -129,11 +144,11 @@ def import_file(filename, lat_idx, lon_idx):
         # lat_lims = [42, 31]  # latitude range over California
         # lon_lims = [-125, -114]  # longitude range over California
 
-        trimmed_data, trimmed_lats, trimmed_lons = trim_data(lat_idx, lon_idx, data, lats, lons)
-
-        trimmed_data = np.reshape(trimmed_data, (1, trimmed_data.shape[0], trimmed_data.shape[1]))
-        trimmed_lats = np.reshape(trimmed_lats, (trimmed_lats.shape[0], 1))
-        trimmed_lons = np.reshape(trimmed_lons, (1, trimmed_lons.shape[0]))
+        # trimmed_data, trimmed_lats, trimmed_lons = trim_data(lat_idx, lon_idx, data, lats, lons)
+        #
+        # trimmed_data = np.reshape(trimmed_data, (1, trimmed_data.shape[0], trimmed_data.shape[1]))
+        # trimmed_lats = np.reshape(trimmed_lats, (trimmed_lats.shape[0], 1))
+        # trimmed_lons = np.reshape(trimmed_lons, (1, trimmed_lons.shape[0]))
 
         return trimmed_data, trimmed_lats, trimmed_lons
 
