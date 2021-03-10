@@ -94,12 +94,12 @@ def combine_arrays(filenames, path):
             lon_lims = [-125, -114]  # longitude range over California
 
             print(lats.shape)
-            print(lat_lims.shape)
+
             lat_coords, lat_idx = get_area_coords(lats, lat_lims)
 
             print(lons.shape)
-            print(lon_lims.shape)
-            long_coords, lon_idx = get_area_coords(lons, lon_lims)
+
+            long_coords, lon_idx = get_area_coords(np.transpose(lons), lon_lims)
 
             trimmed_data, trimmed_lats, trimmed_lons = trim_data(lat_idx, lon_idx, data_temp, lats, lons)
             trimmed_data = np.reshape(trimmed_data, (1, trimmed_data.shape[0], trimmed_data.shape[1]))
