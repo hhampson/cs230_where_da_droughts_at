@@ -95,7 +95,7 @@ def combine_arrays(filenames, path):
 
             if np.sum(lons[i-1, :] != lons[i, :]):
                 raise Exception("Longitudes don't match. File Number" + str(i+1))
-        print(data.shape)
+        print(data_temp.shape)
         print(combined_data.shape)
         combined_data[i, :, :] = data_temp
 
