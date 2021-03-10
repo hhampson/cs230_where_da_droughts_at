@@ -5,6 +5,7 @@ from os import listdir
 import numpy.ma as ma
 from os.path import isfile, join
 
+global combined_data
 
 def build_sm_array():
     # Builds the soil moisture dtaset from the individual data files. The .h5 files should be located in the folder
@@ -104,7 +105,7 @@ def combine_arrays(filenames, path):
             trimmed_lons = np.reshape(trimmed_lons, (1, trimmed_lons.shape[0]))
 
             combined_data = np.zeros((len(filenames), trimmed_data.shape[1], trimmed_data.shape[2]), dtype=np.float32)
-            global combined_data
+
 
         else:
             [data_temp, lats_temp, lons_temp] = import_file((path + "/" + filenames[i]))
@@ -122,7 +123,7 @@ def combine_arrays(filenames, path):
 
             trimmed_lats = lats_temp
             trimmed_lons = lons_temp
-            
+
 
         combined_data[i, :, :] = trimmed_data
         print(combined_data.shape)
