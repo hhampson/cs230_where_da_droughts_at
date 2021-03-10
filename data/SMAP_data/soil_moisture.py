@@ -10,8 +10,8 @@ def build_sm_array():
     # Builds the soil moisture dtaset from the individual data files. The .h5 files should be located in the folder
     # specified by rootdir, with data from each year in a separate subfolder.
 
-    #rootdir = os.getcwd() + "/"
-    rootdir = "C:/Users/Bennett/Documents/School/Stanford/4. CS230 Project/Test Data/"
+    rootdir = os.getcwd() + "/"
+    #rootdir = "C:/Users/Bennett/Documents/School/Stanford/4. CS230 Project/Test Data/"
     print(rootdir)
 
     dirs = listdirs(rootdir)
