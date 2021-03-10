@@ -90,11 +90,11 @@ def combine_arrays(filenames, path):
             # lats = np.concatenate((lats, lats_temp), axis=1)
             # lons = np.concatenate((lons, lons_temp))
 
-            if np.sum(lats[:, i-1] != lats[:, i]):
-                raise Exception("Latitudes don't match. File Number: " + str(i+1))
-
-            if np.sum(lons[i-1, :] != lons[i, :]):
-                raise Exception("Longitudes don't match. File Number" + str(i+1))
+            # if np.sum(lats[:, i-1] != lats[:, i]):
+            #     raise Exception("Latitudes don't match. File Number: " + str(i+1))
+            #
+            # if np.sum(lons[i-1, :] != lons[i, :]):
+            #     raise Exception("Longitudes don't match. File Number" + str(i+1))
         print(data_temp.shape)
         print(combined_data.shape)
         combined_data[i, :, :] = data_temp
