@@ -81,10 +81,10 @@ def combine_arrays(filenames, path):
     # which includes each individual data file, and an averaged array which is an average of all the files. Input
     # arrays must be of the same dimensions
 
-    lat_lims = [42, 31]  # latitude range over California
-    lon_lims = [-125, -114]  # longitude range over California
-    lat_coords, lat_idx = get_area_coords(lats, lat_lims)
-    long_coords, lon_idx = get_area_coords(lons, lon_lims)
+    # lat_lims = [42, 31]  # latitude range over California
+    # lon_lims = [-125, -114]  # longitude range over California
+    # lat_coords, lat_idx = get_area_coords(lats, lat_lims)
+    # long_coords, lon_idx = get_area_coords(lons, lon_lims)
 
     for i in range(len(filenames)):
         print(i)
