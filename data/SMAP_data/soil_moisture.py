@@ -2,6 +2,7 @@ import numpy as np
 import h5py
 import os
 from os import listdir
+import numpy.ma as ma
 from os.path import isfile, join
 
 
@@ -9,10 +10,12 @@ def build_sm_array():
     # Builds the soil moisture dtaset from the individual data files. The .h5 files should be located in the folder
     # specified by rootdir, with data from each year in a separate subfolder.
 
-    rootdir = os.getcwd() + "/"
+    #rootdir = os.getcwd() + "/"
+    rootdir = "C:/Users/Bennett/Documents/School/Stanford/4. CS230 Project/Test Data/"
     print(rootdir)
 
     dirs = listdirs(rootdir)
+    dirs = sorted(dirs)
     print(dirs)
 
     if not dirs:
@@ -29,17 +32,17 @@ def build_sm_array():
                 trimmed_data_temp, trimmed_lats_temp, trimmed_lons_temp = extract_one_year(rootdir + dirs[idx])
                 trimmed_data = np.concatenate((trimmed_data, trimmed_data_temp))
 
-                trimmed_lats = np.concatenate((trimmed_lats, trimmed_lats_temp), axis=1)
-                trimmed_lons = np.concatenate((trimmed_lons, trimmed_lons_temp))
-
-                if np.sum(trimmed_lats[:, idx-1] != trimmed_lats[:, idx]):
-                    raise Exception("Latitudes don't match. File Number: " + str(idx+1))
-
-                if np.sum(trimmed_lons[idx-1, :] != trimmed_lons[idx, :]):
-                    raise Exception("Longitudes don't match. File Number" + str(idx+1))
+                # trimmed_lats = np.concatenate((trimmed_lats, trimmed_lats_temp), axis=1)
+                # trimmed_lons = np.concatenate((trimmed_lons, trimmed_lons_temp))
+                #
+                # if np.sum(trimmed_lats[:, idx-1] != trimmed_lats[:, idx]):
+                #     raise Exception("Latitudes don't match. File Number: " + str(idx+1))
+                #
+                # if np.sum(trimmed_lons[idx-1, :] != trimmed_lons[idx, :]):
+                #     raise Exception("Longitudes don't match. File Number" + str(idx+1))
             idx += 1
 
-    return trimmed_data, trimmed_lats, trimmed_lons
+    return trimmed_data, trimmed_lats, trimmed_lons, dirs
 
 
 def listdirs(folder):
@@ -90,14 +93,14 @@ def combine_arrays(filenames, path):
         print(i)
         if i == 0:
             [data_temp, lats, lons] = import_file((path + "/" + filenames[i]))
-            lat_lims = [42, 31]  # latitude range over California
+            lat_lims = [49, 32.5]  # latitude range over California
             lon_lims = [-125, -114]  # longitude range over California
 
-            print(lats.shape)
+
 
             lat_coords, lat_idx = get_area_coords(lats, lat_lims)
 
-            print(lons.shape)
+
 
             long_coords, lon_idx = get_area_coords(np.transpose(lons), lon_lims)
 
@@ -124,12 +127,15 @@ def combine_arrays(filenames, path):
 
             trimmed_lats = lats_temp
             trimmed_lons = lons_temp
-            print(trimmed_data.shape)
-            print(combined_data.shape)
+
         combined_data[i, :, :] = trimmed_data
 
-    averaged_data = np.average(combined_data, weights=(combined_data > -100), axis=0)
+    weights = combined_data > -100
+
+    averaged_data = np.ma.average(combined_data, weights=weights, axis=0)
     averaged_data = np.reshape(averaged_data, (1, averaged_data.shape[0], averaged_data.shape[1]))
+
+    averaged_data = averaged_data.filled(fill_value=-9999)
 
     # return combined_data, averaged_data, lats[:, 0], lons[0, :]
     return averaged_data, trimmed_lats[:, 0], trimmed_lons[0, :]
@@ -184,8 +190,7 @@ def get_area_coords(coordinate_list, lims):
     return area_coords, idx
 
 
-SIX_MONTH_VALUES, LAT, LON = build_sm_array()
-
+SIX_MONTH_VALUES, LAT, LON, YEARS = build_sm_array()
 
 
 np.save("SIX_MONTH_VALUES_2years.npy", SIX_MONTH_VALUES)
