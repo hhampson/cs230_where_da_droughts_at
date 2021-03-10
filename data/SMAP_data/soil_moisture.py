@@ -89,7 +89,7 @@ def combine_arrays(filenames, path):
     for i in range(len(filenames)):
         print(i)
         if i == 0:
-            [data_temp, lats, lons] = import_file((path + "/" + filenames[i]), lat_idx, lon_idx)
+            [data_temp, lats, lons] = import_file((path + "/" + filenames[i]))
             lat_lims = [42, 31]  # latitude range over California
             lon_lims = [-125, -114]  # longitude range over California
             lat_coords, lat_idx = get_area_coords(lats, lat_lims)
@@ -103,7 +103,7 @@ def combine_arrays(filenames, path):
             combined_data = np.zeros((len(filenames), trimmed_data.shape[1], trimmed_data.shape[2]), dtype=np.float32)
 
         else:
-            [data_temp, lats_temp, lons_temp] = import_file((path + "/" + filenames[i]), lat_idx, lon_idx)
+            [data_temp, lats_temp, lons_temp] = import_file((path + "/" + filenames[i]))
 
             trimmed_data, trimmed_lats, trimmed_lons = trim_data(lat_idx, lon_idx, data_temp, lats, lons)
             trimmed_data = np.reshape(trimmed_data, (1, trimmed_data.shape[0], trimmed_data.shape[1]))
@@ -129,7 +129,7 @@ def combine_arrays(filenames, path):
     return averaged_data, trimmed_lats[:, 0], trimmed_lons[0, :]
 
 
-def import_file(filename, lat_idx, lon_idx):
+def import_file(filename):
     # Imports a .h5 file and extracts the surface level soil moisture data, the latitudes, and the longitudes
     with h5py.File(filename, "r") as f:
         data = f["Forecast_Data"]["sm_surface_forecast"][:, :]
