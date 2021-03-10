@@ -52,16 +52,16 @@ def extract_one_year(path):
     #full_data, averaged_data, lats, lons = combine_arrays(filenames, path)
     averaged_data, lats, lons = combine_arrays(filenames, path)
 
-    lat_lims = [42, 31]  # latitude range over California
-    lon_lims = [-125, -114]  # longitude range over California
+    # lat_lims = [42, 31]  # latitude range over California
+    # lon_lims = [-125, -114]  # longitude range over California
+    #
+    # trimmed_data, trimmed_lats, trimmed_lons = trim_data(lat_lims, lon_lims, averaged_data, lats, lons)
+    #
+    # trimmed_data = np.reshape(trimmed_data, (1, trimmed_data.shape[0], trimmed_data.shape[1]))
+    # trimmed_lats = np.reshape(trimmed_lats, (trimmed_lats.shape[0], 1))
+    # trimmed_lons = np.reshape(trimmed_lons, (1, trimmed_lons.shape[0]))
 
-    trimmed_data, trimmed_lats, trimmed_lons = trim_data(lat_lims, lon_lims, averaged_data, lats, lons)
-
-    trimmed_data = np.reshape(trimmed_data, (1, trimmed_data.shape[0], trimmed_data.shape[1]))
-    trimmed_lats = np.reshape(trimmed_lats, (trimmed_lats.shape[0], 1))
-    trimmed_lons = np.reshape(trimmed_lons, (1, trimmed_lons.shape[0]))
-
-    return trimmed_data, trimmed_lats, trimmed_lons
+    return averaged_data, lats, lons
 
 
 def list_h5_files(path='.'):
@@ -95,9 +95,11 @@ def combine_arrays(filenames, path):
                 raise Exception("Longitudes don't match. File Number" + str(i+1))
             lats = lats_temp
             lons = lons_temp
+            print(data_temp.shape)
+            print(combined_data.shape)
         combined_data[i, :, :] = data_temp
 
-    averaged_data = np.average(combined_data, weights=(combined_data < 100), axis=0)
+    averaged_data = np.average(combined_data, weights=(combined_data > -100), axis=0)
     averaged_data = np.reshape(averaged_data, (1, averaged_data.shape[0], averaged_data.shape[1]))
 
     # return combined_data, averaged_data, lats[:, 0], lons[0, :]
@@ -107,8 +109,8 @@ def combine_arrays(filenames, path):
 def import_file(filename):
     # Imports a .h5 file and extracts the surface level soil moisture data, the latitudes, and the longitudes
     with h5py.File(filename, "r") as f:
-        surface = f["Forecast_Data"]["sm_surface_forecast"][:, :]
-        surface = np.reshape(surface, (1, surface.shape[0], surface.shape[1]))
+        data = f["Forecast_Data"]["sm_surface_forecast"][:, :]
+        data = np.reshape(data, (1, data.shape[0], data.shape[1]))
 
         lats = f["cell_lat"][:, 0]
         lats = np.reshape(lats, (lats.shape[0], 1))
@@ -116,7 +118,16 @@ def import_file(filename):
         lons = f["cell_lon"][0, :]
         lons = np.reshape(lons, (1, lons.shape[0]))
 
-        return surface.astype('float32'), lats, lons
+        lat_lims = [42, 31]  # latitude range over California
+        lon_lims = [-125, -114]  # longitude range over California
+
+        trimmed_data, trimmed_lats, trimmed_lons = trim_data(lat_lims, lon_lims, data, lats, lons)
+
+        trimmed_data = np.reshape(trimmed_data, (1, trimmed_data.shape[0], trimmed_data.shape[1]))
+        trimmed_lats = np.reshape(trimmed_lats, (trimmed_lats.shape[0], 1))
+        trimmed_lons = np.reshape(trimmed_lons, (1, trimmed_lons.shape[0]))
+
+        return trimmed_data, trimmed_lats, trimmed_lons
 
 
 def trim_data(lat_lim, lon_lim, area, lats, lons):
