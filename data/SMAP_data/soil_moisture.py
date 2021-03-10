@@ -116,11 +116,11 @@ def combine_arrays(filenames, path):
             lats_temp = np.reshape(trimmed_lats, (trimmed_lats.shape[0], 1))
             lons_temp = np.reshape(trimmed_lons, (1, trimmed_lons.shape[0]))
 
-            if np.sum(lats != lats_temp):
-                raise Exception("Latitudes don't match. File Number: " + str(i+1))
-
-            if np.sum(lons != lons_temp):
-                raise Exception("Longitudes don't match. File Number" + str(i+1))
+            # if np.sum(lats != lats_temp):
+            #     raise Exception("Latitudes don't match. File Number: " + str(i+1))
+            #
+            # if np.sum(lons != lons_temp):
+            #     raise Exception("Longitudes don't match. File Number" + str(i+1))
 
             trimmed_lats = lats_temp
             trimmed_lons = lons_temp
