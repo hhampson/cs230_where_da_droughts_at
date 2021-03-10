@@ -104,6 +104,7 @@ def combine_arrays(filenames, path):
             trimmed_lons = np.reshape(trimmed_lons, (1, trimmed_lons.shape[0]))
 
             combined_data = np.zeros((len(filenames), trimmed_data.shape[1], trimmed_data.shape[2]), dtype=np.float32)
+            global combined_data
 
         else:
             [data_temp, lats_temp, lons_temp] = import_file((path + "/" + filenames[i]))
@@ -121,11 +122,11 @@ def combine_arrays(filenames, path):
 
             trimmed_lats = lats_temp
             trimmed_lons = lons_temp
-            print("test")
+            
 
         combined_data[i, :, :] = trimmed_data
         print(combined_data.shape)
-
+    print(combined_data.shape)
     weights = combined_data > -100
 
     averaged_data = np.ma.average(combined_data, weights=weights, axis=0)
