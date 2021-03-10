@@ -54,6 +54,10 @@ def extract_one_year(path):
 
     # lat_lims = [42, 31]  # latitude range over California
     # lon_lims = [-125, -114]  # longitude range over California
+    # lat_coords, lat_idx = get_area_coords(lats, lat_lims)
+    # long_coords, lon_idx = get_area_coords(lons, lon_lims)
+
+    
     #
     # trimmed_data, trimmed_lats, trimmed_lons = trim_data(lat_lims, lon_lims, averaged_data, lats, lons)
     #
@@ -77,15 +81,19 @@ def combine_arrays(filenames, path):
     # which includes each individual data file, and an averaged array which is an average of all the files. Input
     # arrays must be of the same dimensions
 
+    lat_lims = [42, 31]  # latitude range over California
+    lon_lims = [-125, -114]  # longitude range over California
+    lat_coords, lat_idx = get_area_coords(lats, lat_lims)
+    long_coords, lon_idx = get_area_coords(lons, lon_lims)
+
     for i in range(len(filenames)):
         print(i)
         if i == 0:
-            [data_temp, lats, lons] = import_file(path + "/" + filenames[i])
+            [data_temp, lats, lons] = import_file((path + "/" + filenames[i]), lat_idx, lon_idx)
             combined_data = np.zeros((len(filenames), data_temp.shape[1], data_temp.shape[2]), dtype=np.float32)
 
-
         else:
-            [data_temp, lats_temp, lons_temp] = import_file(path + "/" + filenames[i])
+            [data_temp, lats_temp, lons_temp] = import_file((path + "/" + filenames[i]), lat_idx, lon_idx)
 
 
             if np.sum(lats != lats_temp):
@@ -106,7 +114,7 @@ def combine_arrays(filenames, path):
     return averaged_data, lats[:, 0], lons[0, :]
 
 
-def import_file(filename):
+def import_file(filename, lat_idx, lon_idx):
     # Imports a .h5 file and extracts the surface level soil moisture data, the latitudes, and the longitudes
     with h5py.File(filename, "r") as f:
         data = f["Forecast_Data"]["sm_surface_forecast"][:, :]
@@ -118,10 +126,10 @@ def import_file(filename):
         lons = f["cell_lon"][0, :]
         lons = np.reshape(lons, (1, lons.shape[0]))
 
-        lat_lims = [42, 31]  # latitude range over California
-        lon_lims = [-125, -114]  # longitude range over California
+        # lat_lims = [42, 31]  # latitude range over California
+        # lon_lims = [-125, -114]  # longitude range over California
 
-        trimmed_data, trimmed_lats, trimmed_lons = trim_data(lat_lims, lon_lims, data, lats, lons)
+        trimmed_data, trimmed_lats, trimmed_lons = trim_data(lat_idx, lon_idx, data, lats, lons)
 
         trimmed_data = np.reshape(trimmed_data, (1, trimmed_data.shape[0], trimmed_data.shape[1]))
         trimmed_lats = np.reshape(trimmed_lats, (trimmed_lats.shape[0], 1))
@@ -130,10 +138,10 @@ def import_file(filename):
         return trimmed_data, trimmed_lats, trimmed_lons
 
 
-def trim_data(lat_lim, lon_lim, area, lats, lons):
+def trim_data(lat_idx, lon_idx, area, lats, lons):
     # Trims data arrays to the specified latitude and longitude limits
-    lat_coords, lat_idx = get_area_coords(lats, lat_lim)
-    long_coords, lon_idx = get_area_coords(lons, lon_lim)
+    # lat_coords, lat_idx = get_area_coords(lats, lat_lim)
+    # long_coords, lon_idx = get_area_coords(lons, lon_lim)
 
     trimmed_data = area[0, lat_idx[0]:lat_idx[1], lon_idx[0]:lon_idx[1]]
     trimmed_lats = lats[lat_idx[0]:lat_idx[1]]
