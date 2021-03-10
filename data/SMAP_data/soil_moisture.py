@@ -95,13 +95,7 @@ def combine_arrays(filenames, path):
             [data_temp, lats, lons] = import_file((path + "/" + filenames[i]))
             lat_lims = [49, 32.5]  # latitude range over California
             lon_lims = [-125, -114]  # longitude range over California
-
-
-
             lat_coords, lat_idx = get_area_coords(lats, lat_lims)
-
-
-
             long_coords, lon_idx = get_area_coords(np.transpose(lons), lon_lims)
 
             trimmed_data, trimmed_lats, trimmed_lons = trim_data(lat_idx, lon_idx, data_temp, lats, lons)
@@ -127,8 +121,10 @@ def combine_arrays(filenames, path):
 
             trimmed_lats = lats_temp
             trimmed_lons = lons_temp
+            print("test")
 
         combined_data[i, :, :] = trimmed_data
+        print(combined_data.shape)
 
     weights = combined_data > -100
 
