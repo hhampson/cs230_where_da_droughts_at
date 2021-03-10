@@ -49,7 +49,8 @@ def extract_one_year(path):
     # Extracts all the .h5 files in one folder and combines them to an averaged output for that year
     filenames = list_h5_files(path)
 
-    full_data, averaged_data, lats, lons = combine_arrays(filenames, path)
+    #full_data, averaged_data, lats, lons = combine_arrays(filenames, path)
+    averaged_data, lats, lons = combine_arrays(filenames, path)
 
     lat_lims = [42, 31]  # latitude range over California
     lon_lims = [-125, -114]  # longitude range over California
@@ -78,32 +79,29 @@ def combine_arrays(filenames, path):
 
     for i in range(len(filenames)):
         print(i)
-        print("test")
         if i == 0:
             [data_temp, lats, lons] = import_file(path + "/" + filenames[i])
             combined_data = np.zeros((len(filenames), data_temp.shape[1], data_temp.shape[2]), dtype=np.float32)
-            print("test2")
+
 
         else:
             [data_temp, lats_temp, lons_temp] = import_file(path + "/" + filenames[i])
-            #combined_data = np.concatenate((combined_data, surface))
-            # lats = np.concatenate((lats, lats_temp), axis=1)
-            # lons = np.concatenate((lons, lons_temp))
 
-            # if np.sum(lats[:, i-1] != lats[:, i]):
-            #     raise Exception("Latitudes don't match. File Number: " + str(i+1))
-            #
-            # if np.sum(lons[i-1, :] != lons[i, :]):
-            #     raise Exception("Longitudes don't match. File Number" + str(i+1))
-        print(data_temp.shape)
-        print(combined_data.shape)
+
+            if np.sum(lats != lats_temp):
+                raise Exception("Latitudes don't match. File Number: " + str(i+1))
+
+            if np.sum(lons != lons_temp):
+                raise Exception("Longitudes don't match. File Number" + str(i+1))
+            lats = lats_temp
+            lons = lons_temp
         combined_data[i, :, :] = data_temp
-
 
     averaged_data = np.average(combined_data, weights=(combined_data < 100), axis=0)
     averaged_data = np.reshape(averaged_data, (1, averaged_data.shape[0], averaged_data.shape[1]))
 
-    return combined_data, averaged_data, lats[:, 0], lons[0, :]
+    # return combined_data, averaged_data, lats[:, 0], lons[0, :]
+    return averaged_data, lats[:, 0], lons[0, :]
 
 
 def import_file(filename):
