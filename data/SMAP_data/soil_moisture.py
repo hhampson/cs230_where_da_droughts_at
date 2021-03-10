@@ -79,11 +79,12 @@ def combine_arrays(filenames, path):
     for i in range(len(filenames)):
         print(i)
         if i == 0:
-            [combined_data, lats, lons] = import_file(path + "/" + filenames[i])
+            [data_temp, lats, lons] = import_file(path + "/" + filenames[i])
+            combined_data = np.zeros((len(filenames), data_temp.shape[0], data_temp.shape[0]))
 
         else:
-            [surface, lats_temp, lons_temp] = import_file(path + "/" + filenames[i])
-            combined_data = np.concatenate((combined_data, surface))
+            [data_temp, lats_temp, lons_temp] = import_file(path + "/" + filenames[i])
+            #combined_data = np.concatenate((combined_data, surface))
             # lats = np.concatenate((lats, lats_temp), axis=1)
             # lons = np.concatenate((lons, lons_temp))
 
@@ -92,6 +93,8 @@ def combine_arrays(filenames, path):
 
             if np.sum(lons[i-1, :] != lons[i, :]):
                 raise Exception("Longitudes don't match. File Number" + str(i+1))
+        combined_data[i, :, :] = data_temp
+        print(combined_data.shape)
 
     averaged_data = np.average(combined_data, weights=(combined_data < 100), axis=0)
     averaged_data = np.reshape(averaged_data, (1, averaged_data.shape[0], averaged_data.shape[1]))
