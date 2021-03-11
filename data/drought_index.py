@@ -37,6 +37,7 @@ def extract_data(filename):
     """
     data = nc.Dataset(filename)
     values = data.variables['spei'][:]  # SPEI
+    values[values > 10] = None
     time_days = data.variables['time'][:]  # days since 1901-01-01
     time = convert_time(time_days)
     lat = data.variables['lat'][:]
