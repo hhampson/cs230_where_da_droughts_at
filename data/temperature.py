@@ -56,7 +56,7 @@ def get_area_coords(coordinate_list, lims):
     return area_coords, idx
 
 
-def extract_temp_data(data, lat_lims, lon_lims, data_type):
+def extract_temp_data(data, lat_lims_var, lon_lims_var, data_type):
     """
     Open up temperature netcdf file and extract content, including clipping to the
     latitude and longitude limits of interest (specified in variables.py).
@@ -64,9 +64,9 @@ def extract_temp_data(data, lat_lims, lon_lims, data_type):
     values = data.variables['t' + data_type][:]  # tmin or tmax
     time = data.variables['time'][:]
     lat = data.variables['lat'][:]
-    lon = data.variables['lon'][:]
-    area_lat, idx_lat = get_area_coords(lat, lat_lims[::-1])  # reverse latitide limits
-    area_lon, idx_lon = get_area_coords(lon, lon_lims)
+    lon = data.variables['lon'][:] - 360
+    area_lat, idx_lat = get_area_coords(lat, lat_lims_var)
+    area_lon, idx_lon = get_area_coords(lon, lon_lims_var)
     area_values = values[:, idx_lat[0]:idx_lat[1], idx_lon[0]:idx_lon[1]]
     dict_temp = {'values': values,
                  'area_lat': area_lat,
@@ -89,6 +89,14 @@ def average_temp_data(area_value, from_year, to_year):
         area_average = np.concatenate((area_average, np.reshape(area, (1, area_value.shape[1], area_value.shape[2]))))
     return area_average
 
+def monthly_average(temp, area_value, from_year, to_year):
+    area_average = np.empty((0, area_value.shape[1], area_value.shape[2]))
+    
+    for month in range(0,12 * 4):
+        area = np.mean(temp[30*month:30*month+30,:,:],axis = 0)
+        area_average = np.concatenate((area_average, np.reshape(area, (1, area_value.shape[1], area_value.shape[2]))))
+    
+    return area_average
 
 # convert start and end year variable input to using input
 from_year = year_start
@@ -96,8 +104,8 @@ to_year = year_end + 1
 types = ["max", "min"]
 
 # convert lat and long variable input to using input
-lat_lims_var = [lat_lims[1], lat_lims[0]]
-lon_lims_var = [lon_lims[0] + 360, lon_lims[1] + 360]
+lat_lims_var = [lat_lims[0] - 1, lat_lims[1] -1]
+lon_lims_var = lon_lims
 
 dict_tmax = dict()
 dict_tmin = dict()
@@ -121,10 +129,25 @@ for year in range(from_year, to_year + 1, 1):  # to include to_year
 tmin_all = np.concatenate([dict_tmin[year]['area_values'] for year in range(from_year, to_year + 1)])
 tmax_all = np.concatenate([dict_tmax[year]['area_values'] for year in range(from_year, to_year + 1)])
 
-# create average values
+tmin_all[tmin_all < -9e+30] = None
+tmax_all[tmax_all < -9e+30] = None
+
+# create 6 month average values
 SIX_MONTH_VALUES_TMIN = average_temp_data(tmin_all, from_year, to_year)
 SIX_MONTH_VALUES_TMAX = average_temp_data(tmax_all, from_year, to_year)
 
-LAT = dict_tmin[from_year]['area_lat'][::-1]
-LON = dict_tmin[from_year]['area_lon'] - 360
+LAT = dict_tmin[from_year]['area_lat']
+LON = dict_tmin[from_year]['area_lon']
 YEARS = np.arange(from_year, to_year)
+
+# monthly averages values
+monthly_area_average_min = monthly_average(tmin_all, tmin_all, from_year, to_year)
+print(monthly_area_average_min[1][:][:])
+
+monthly_area_average_max = monthly_average(tmax_all, tmax_all, from_year, to_year)
+print(np.min(monthly_area_average_max))
+
+np.save("MINTEMP_monthly.npy", np.array(monthly_area_average_min))
+np.save("MAXTEMP_monthly.npy", np.array(monthly_area_average_max))
+np.save("LAT_TEMP.npy", np.array(LAT))
+np.save("LON_TEMP.npy", np.array(LON))
