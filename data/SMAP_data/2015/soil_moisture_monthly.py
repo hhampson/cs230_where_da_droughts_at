@@ -36,11 +36,11 @@ def extract_one_year(rootdir):
         if i == 0:
             month_data, lats, lons = combine_arrays(months[month], rootdir)
             year_data = np.zeros((len(months.keys()), month_data.shape[1], month_data.shape[2]), dtype=np.float32)
-            month_order = month
+            month_order = []
         else:
             month_data, lats, lons = combine_arrays(months[month], rootdir)
-            month_order.append(month)
 
+        month_order.append(month)
         year_data[i, :, :] = month_data
         i += 1
         print("month", month_data.shape)
