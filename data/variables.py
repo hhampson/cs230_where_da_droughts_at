@@ -7,4 +7,4 @@ wet_month_start = dry_month_end + 1  # start of "wet" season of inputs beginning
 wet_month_end = dry_month_start - 1  # end of "wet" season of inputs end of April
 
 year_start = 2015
-year_end = 2017  # final prediction in year_end + 1 dry season
+year_end = 2018  # final drought prediction in this year's dry season
