@@ -132,3 +132,9 @@ def get_area_coords(coordinate_list, lims):
         idx.append(final_value)
     area_coords = coordinate_list[idx[0]: idx[1]]
     return area_coords, idx
+
+
+MONTHLY_VALUES, LAT, LON = build_sm_array()
+print(MONTHLY_VALUES.shape)
+print(LAT.shape)
+print(LON.shape)
