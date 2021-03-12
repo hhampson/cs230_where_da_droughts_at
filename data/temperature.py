@@ -100,7 +100,7 @@ def monthly_average(temp, area_value, from_year, to_year):
 
 # convert start and end year variable input to using input
 from_year = year_start
-to_year = year_end + 1
+to_year = year_end
 types = ["max", "min"]
 
 # convert lat and long variable input to using input
