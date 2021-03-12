@@ -12,10 +12,10 @@ def build_sm_array():
     rootdir = os.getcwd() + "/"
     #rootdir = "C:/Users/Bennett/Documents/School/Stanford/4. CS230 Project/Test Data/"
 
-    year_data, lats, lons = extract_one_year(rootdir)
+    year_data, lats, lons, month_order = extract_one_year(rootdir)
     print(year_data.shape)
 
-    return year_data, lats, lons
+    return year_data, lats, lons, month_order
 
 
 def extract_one_year(rootdir):
@@ -36,12 +36,15 @@ def extract_one_year(rootdir):
         if i == 0:
             month_data, lats, lons = combine_arrays(months[month], rootdir)
             year_data = np.zeros((len(months.keys()), month_data.shape[1], month_data.shape[2]), dtype=np.float32)
+            month_order = month
         else:
             month_data, lats, lons = combine_arrays(months[month], rootdir)
+            month_order.append(month)
+
         year_data[i, :, :] = month_data
         i += 1
-        print(month_data.shape)
-    return year_data, lats, lons
+        print("month", month_data.shape)
+    return year_data, lats, lons, month_order
 
 
 def list_h5_files(path='.'):
@@ -69,7 +72,7 @@ def combine_arrays(filenames, rootdir):
             trimmed_data, trimmed_lats, trimmed_lons = trim_data(lat_idx, lon_idx, data_temp, lats, lons)
             trimmed_data = np.reshape(trimmed_data, (1, trimmed_data.shape[0], trimmed_data.shape[1]))
             trimmed_lats = np.reshape(trimmed_lats, (trimmed_lats.shape[0], 1))
-            print(trimmed_lons.shape)
+
             trimmed_lons = np.reshape(trimmed_lons, (1, trimmed_lons.shape[1]))
 
             combined_data = np.zeros((len(filenames), trimmed_data.shape[1], trimmed_data.shape[2]), dtype=np.float32)
@@ -134,7 +137,8 @@ def get_area_coords(coordinate_list, lims):
     return area_coords, idx
 
 
-MONTHLY_VALUES, LAT, LON = build_sm_array()
-print(MONTHLY_VALUES.shape)
-print(LAT.shape)
-print(LON.shape)
+MONTHLY_VALUES, LAT, LON, MONTH_ORDER = build_sm_array()
+print(MONTH_ORDER)
+np.save("MONTHLY_VALUES_2015.npy", MONTHLY_VALUES)
+np.save("LAT_2015.npy", LAT)
+np.save("LON_2015.npy", LON)
