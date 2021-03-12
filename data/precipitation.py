@@ -20,7 +20,7 @@ import numpy as np
 from numpy import newaxis
 from datetime import date
 from dateutil.relativedelta import relativedelta
-from data.variables import *  # imports variables such as lat_lims, lon_lims
+from variables import *  # imports variables such as lat_lims, lon_lims
 
 
 
@@ -36,7 +36,7 @@ def download_data(filename):
     ftp.cwd('/Public/www')
     file = open(filename, 'wb')
     ftp.retrbinary('RETR ' + filename, file.write)
-    os.rename(filename, NEW_FILENAME)
+    os.rename(filename, NEW_FILENAME)  # TODO: problem renaming because it takes a second to download
     ftp.quit()
 
 
@@ -122,13 +122,38 @@ def convert_to_six_month(values, time):
     return six_month_values, years
 
 
+def convert_to_monthly(values, time):
+    # initialize monthly values matrix
+    monthly_values = np.empty((0, values.shape[1], values.shape[2]))
+    start_idx = 0
+    months = []
+    for i in range(len(time) - 1):
+        if time[i].month != time[i-1].month:  # entering new month
+            end_idx = i-1
+            months.append(time[i-1].month)
+            month_values = values[start_idx:end_idx, :, :].sum(axis=0)  # sum over previous month
+            month_values = month_values[newaxis, :, :]
+            monthly_values = np.concatenate((monthly_values, month_values))
+            start_idx = i
+        elif time[i].month == 1 and time[i].year == year_end + 1:  # end when we get past desired time period
+            break
+    assert monthly_values.shape[0] == 12 * (year_end - year_start + 1)
+    return monthly_values
+
+
 # v1 filename: X128.12.122.45.54.19.46.11.nc
 # v2 filename:
 FILENAME = 'X128.12.122.126.61.19.40.47.nc'  # name of file in NOAA server, w/ temporal and spatial boundaries specified
 NEW_FILENAME = "~/data/precipitation.nc"  # store file to data folder in instance
 
-download_data(FILENAME)
+# download_data(FILENAME)
 # view_data(NEW_FILENAME)
 # Variables of interest for build_dataset.py: six_month_values, years, lat, lon
-TOTAL_VALUES, LAT, LON, TIME, VALUES = extract_data(NEW_FILENAME)
+TOTAL_VALUES, LAT, LON, TIME, VALUES = extract_data(FILENAME)
 SIX_MONTH_VALUES, YEARS = convert_to_six_month(VALUES, TIME)
+MONTHLY_VALUES = convert_to_monthly(VALUES, TIME)
+
+np.save("../processed_data/PRECIP_monthly.npy", np.array(MONTHLY_VALUES))
+np.save("../processed_data/LAT_PRECIP.npy", np.array(LAT))
+np.save("../processed_data/LON_PRECIP.npy", np.array(LON))
+
