@@ -65,6 +65,7 @@ def extract_data(filename):
     area_lat, idx_lat = get_area_coords(lat, lat_lims[::-1])  # reverse latitude limits
     area_lon, idx_lon = get_area_coords(lon, lon_lims)
     area_values = values[:, idx_lat[0]:idx_lat[1], idx_lon[0]:idx_lon[1]]
+    area_values = area_values.filled(fill_value=np.nan)
     return values, area_lat, area_lon, time, area_values
 
 
