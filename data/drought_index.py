@@ -14,7 +14,7 @@ latitude numpy array, and longitude numpy array.
 import netCDF4 as nc
 import numpy as np
 from numpy import newaxis
-from data.variables import *  # imports variables such as lat_lims, lon_lims
+from variables import *  # imports variables such as lat_lims, lon_lims
 from datetime import date
 from dateutil.relativedelta import relativedelta
 
@@ -99,13 +99,13 @@ def find_start_idx(time):
     Find index of time corresponding to our start year (from variables.py).
     """
     for i in range(len(time)):
-        if time[i].year == year_start + 1:  # add one because dry season here lags by 6 months, which is in next yr
+        if time[i].year == year_start:
             return i
 
 
 # Variables of interest for build_dataset.py: six_month_values, years, lat, lon
 # Reference SPEI netcdf file
-FILENAME = '~/data/spei06.nc'
+FILENAME = 'spei06.nc'
 # view_data(filename)
 TOTAL_VALUES, LAT, LON, TIME, VALUES = extract_data(FILENAME)
 SIX_MONTH_VALUES, YEARS = extract_times(VALUES, TIME)
