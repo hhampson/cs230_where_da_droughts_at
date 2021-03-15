@@ -6,7 +6,6 @@ from sklearn import linear_model
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error, r2_score
 import seaborn as sns
-get_ipython().run_line_magic('matplotlib', 'inline')
 
 ## load dataset
 x = np.load('X_v2.npy')
