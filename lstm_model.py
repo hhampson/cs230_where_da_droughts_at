@@ -39,7 +39,7 @@ class DroughtDataset(Dataset):
 
 
 ## loading training data
-drought_dataset = DroughtDataset('x_train_v3.npy', 'y_train_v3.npy')
+drought_dataset = DroughtDataset('x_train.npy', 'y_train.npy')
 
 for i in range(len(drought_dataset)):
     sample = drought_dataset[i]
@@ -77,7 +77,7 @@ loss_function = nn.MSELoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
 model.train()
-
+loss_values = []
 ## training the model
 for i in trange(epochs):
     sum_loss = 0
@@ -94,13 +94,21 @@ for i in trange(epochs):
         optimizer.step()
         sum_loss += single_loss
 
+
     if i % 5 == 1:
         print(f'epoch: {i:3} loss: {sum_loss.cpu().item() / len(dataloader):10.8f}')
+    loss_values.append(sum_loss.cpu().item() / len(dataloader))
 
 print(f'epoch: {i:3} loss: {single_loss.cpu().item():10.10f}')
 
+plt.plot(range(1, len(loss_values) + 1), loss_values)
+plt.xlabel('Epoch')
+plt.ylabel('Error Rate')
+plt.show()
+
+
 ## loading testing data
-drought_dataset_test = DroughtDataset('x_test_v3.npy', 'y_test_v3.npy')
+drought_dataset_test = DroughtDataset('x_test.npy', 'y_test.npy')
 
 test_size = len(drought_dataset_test)
 
