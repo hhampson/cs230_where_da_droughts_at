@@ -39,7 +39,7 @@ class DroughtDataset(Dataset):
 
 
 ## loading training data
-drought_dataset = DroughtDataset('x_train.npy', 'y_train.npy')
+drought_dataset = DroughtDataset('x_train_v3.npy', 'y_train_v3.npy')
 
 for i in range(len(drought_dataset)):
     sample = drought_dataset[i]
@@ -100,7 +100,7 @@ for i in trange(epochs):
 print(f'epoch: {i:3} loss: {single_loss.cpu().item():10.10f}')
 
 ## loading testing data
-drought_dataset_test = DroughtDataset('x_test.npy', 'y_test.npy')
+drought_dataset_test = DroughtDataset('x_test_v3.npy', 'y_test_v3.npy')
 
 test_size = len(drought_dataset_test)
 
