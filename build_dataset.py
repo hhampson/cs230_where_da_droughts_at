@@ -9,6 +9,8 @@ import numpy as np
 # from data import precipitation, drought_index, temperature, soil_moisture
 from tempfile import TemporaryFile
 import pandas as pd
+from matplotlib import pyplot as plt
+from scipy import stats
 from data.variables import *  # imports variables such as lat_lims, lon_lims
 
 
@@ -51,6 +53,10 @@ def main():
     assert precip.shape == min_temp.shape == max_temp.shape == sm.shape
 
     x, y = build_x_y(di, precip, min_temp, max_temp, sm)
+
+    check_distribution(x, y, 'normal_fit_original.png')
+    x = normalize_precip(x)
+    check_distribution(x, y, 'normal_fit_normalized_precip.png')
 
     return y, x
 
@@ -198,9 +204,56 @@ def drop_nans_old(x_nans, y_nans):
     return x_no_nans, y_no_nans
 
 
+def normalize_precip(x):
+    """
+    Applies log transform to precip data to normalize.
+    """
+    precip = x[:, :, 0]
+    normalized_precip = np.ma.log(precip)
+    x[:, :, 0] = normalized_precip.filled(0)
+    return x
+
+
+def check_distribution(x, y, fig_name):
+    # make plots of histograms and probability density functions overlaid to see distribution
+    fig = plt.figure()
+    # Precip
+    precip = x[:, :, 0].reshape(-1, 1)
+    fig = make_subplot(precip, 1, .1, fig, 'Precipitation')
+    # Min temp
+    min_temp = x[:, :, 1].reshape(-1, 1)
+    fig = make_subplot(min_temp, 2, 1, fig, 'Minimum Temperature')
+    # Max temp
+    max_temp = x[:, :, 2].reshape(-1, 1)
+    fig = make_subplot(max_temp, 3, 1, fig, 'Maximum Temperature')
+    # Soil moisture
+    sm = x[:, :, 3].reshape(-1, 1)
+    fig = make_subplot(sm, 4, .01, fig, 'Soil Moisture')
+    # Drought index
+    di = y
+    fig = make_subplot(di, 5, 0.1, fig, 'Drought Index')
+    fig.tight_layout()
+    plt.savefig(fig_name)
+    plt.clf()
+
+
+def make_subplot(values, subplot_num, step, fig, var_name):
+    m = np.mean(values)  # mean
+    std = np.std(values)  # standard deviation
+    fig.add_subplot(2, 3, subplot_num)
+    plt.hist(values, density=True, color='gray', edgecolor='none')  # histogram
+    x = np.arange(min(values), max(values), step)  # points to plot at
+    pdf = stats.norm.pdf(x, loc=m, scale=std)  # normal fit pdf
+    plt.title(var_name)
+    plt.plot(x, pdf, color='blue', linewidth=2)
+    return fig
+
+
 Y, X = main()
 outfile = TemporaryFile()
 # np.save('Y',Y)  # first test
 # np.save('X',X)  # first test
-np.save('Y_v2', Y)  # version 2
-np.save('X_v2', X)  # version 2
+# np.save('Y_v2', Y)  # version 2
+# np.save('X_v2', X)  # version 2
+np.save('Y_v3', Y)  # version 3
+np.save('X_v3', X)  # version 3
