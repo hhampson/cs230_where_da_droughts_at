@@ -105,7 +105,7 @@ print(f'epoch: {i:3} loss: {single_loss.cpu().item():10.10f}')
 plt.plot(range(1, len(loss_values) + 1), loss_values)
 plt.xlabel('Epoch')
 plt.ylabel('Error Rate')
-plt.show()
+plt.savefig("Error Rate")
 
 
 ## loading testing data
@@ -135,5 +135,6 @@ for i in range(test_size):
 predicted_y = np.reshape(out_data.numpy(), (out_data.numpy().shape[0], 1))
 actual_y = drought_dataset_test.Y
 
+np.save("predicted SPEI.npy", predicted_y)
 test_error = np.mean(np.square((predicted_y-actual_y)))
 print(test_error)
