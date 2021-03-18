@@ -142,9 +142,9 @@ y=x
 ymax = y + 0.185
 ymin = y - 0.185
 
-plt.plot(x, y)
-plt.fill_between(x, ymin, ymax, alpha=0.2)
-plt.scatter(actual_y, predicted_y, color='black',  s=10)
+plt.plot(x, y, label='y = y_hat')
+plt.fill_between(x, ymin, ymax, alpha=0.2, label='Linear Regression MSE')
+plt.scatter(actual_y, predicted_y, color='black',  s=10, label='Predictions')
 plt.xlabel('Actual SPEI')
 plt.ylabel('Predicted SPEI')
 plt.savefig("y_vs_y")
