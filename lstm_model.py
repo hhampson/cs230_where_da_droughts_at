@@ -9,7 +9,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 ## hyperparameters
-batch_size = 222
+batch_size = 1
 hidden_layers = 32
 learning_rate = 0.001
 epochs = 150
