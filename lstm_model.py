@@ -147,6 +147,7 @@ plt.fill_between(x, ymin, ymax, alpha=0.2, label='Linear Regression MSE')
 plt.scatter(actual_y, predicted_y, color='black',  s=10, label='Predictions')
 plt.xlabel('Actual SPEI')
 plt.ylabel('Predicted SPEI')
+plt.legend(loc="bottom right")
 plt.savefig("y_vs_y")
 
 
