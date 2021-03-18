@@ -137,10 +137,14 @@ actual_y = drought_dataset_test.Y
 
 
 ## Plot Y Hat
-x = np.linspace(-2, 1.5)
+x = np.linspace(-2, 1.3)
 y=x
-plt.plot(x, y, 'k')
-plt.scatter(actual_y, predicted_y, s=10)
+ymax = y + 0.05
+ymin = y - 0.05
+
+plt.plot(x, y)
+plt.fill_between(x, ymin, ymax, alpha=0.2)
+plt.scatter(actual_y, predicted_y, 'k',  s=10)
 plt.xlabel('Actual SPEI')
 plt.ylabel('Predicted SPEI')
 plt.savefig("y_vs_y")
