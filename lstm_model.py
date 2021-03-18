@@ -144,7 +144,7 @@ ymin = y - 0.05
 
 plt.plot(x, y)
 plt.fill_between(x, ymin, ymax, alpha=0.2)
-plt.scatter(actual_y, predicted_y, 'k',  s=10)
+plt.scatter(actual_y, predicted_y, color='black',  s=10)
 plt.xlabel('Actual SPEI')
 plt.ylabel('Predicted SPEI')
 plt.savefig("y_vs_y")
