@@ -139,8 +139,8 @@ actual_y = drought_dataset_test.Y
 ## Plot Y Hat
 x = np.linspace(-2, 1.3)
 y=x
-ymax = y + np.sqrt(0.05)
-ymin = y - np.sqrt(0.05)
+ymax = y + 0.185
+ymin = y - 0.185
 
 plt.plot(x, y)
 plt.fill_between(x, ymin, ymax, alpha=0.2)
